@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 import yaml
 from json import dumps as json_dumps
 from sys import argv
@@ -45,7 +45,49 @@ def generate_parsons_component() -> None:
     # TODO: run logan's tool
     pass
 
+def generate_mutations(q_root: str, mutations: Dict):
 
+    def overlaps(intervals: Tuple[int, int]) -> bool:
+        last = intervals[0]
+        for intv in intervals[1:]:
+            if intv[1] < last[1]:
+                return False
+        return True
+
+    for suite, files in mutations.items():
+        safe_mkdir(f"{q_root}/tests/{suite}")
+
+        for file, mutations in files.items():
+            line = 1
+            locations = list(map( # basically 'num1-num2' -> { (num1,num2): 'num1-num2', ...}
+                lambda s, e: (int(s), int(e)),
+                map(
+                    lambda i: i.split('-'), 
+                    file.keys()
+                )
+            ))
+            locations = sorted(locations, key=(lambda e: e[0]))
+
+            if overlaps(locations):
+                clean_up()
+
+            with open(file, 'r') as inp:
+                with open(file, 'w') as out:
+
+                    for location in locations:
+                        code = file[f"{location[0]}-{location[1]}"]
+
+                        # copy over content before the interval
+                        if line < location[0]:
+                            out.write(inp.readline(location[0] - line))
+
+                        # skip over content in the interval
+                        inp.readline(location[1] - location[0])
+                        # insert new content in the interval
+                        out.write(inp.readline(code))
+                    
+                    # add back in everything following the mutations
+                    out.writelines(inp.readlines())
 
 def write_solution(q_root: str, solution: str) -> None:
     """Generate suites/solution/_submission_file using the provided solution"""
@@ -56,6 +98,10 @@ def write_solution(q_root: str, solution: str) -> None:
 def write_metadata(q_root: str, submit_to: str) -> None:
     with open(f"{q_root}/suites/meta.json", 'w') as meta:
         meta.write(json_dumps({ "submission_file" : submit_to, "submission_root" : "" }))
+
+def clean_up() -> None:
+    # TODO: remove all files and make it look like we were never here
+    exit(1)
 
 if __name__ == "__main__":
     q_root = argv[1]
@@ -73,23 +119,24 @@ if __name__ == "__main__":
     # write_to("info.json", base_info_json)
     make_parson_source(q_root, prompt, solution)
     
-    generate_parsons_component()
+    # should include ans.py, question.html
+    generate_parsons_component() 
 
 
-    safe_mkdir(f"{q_root}/suites")
+    safe_mkdir(f"{q_root}/tests")
 
     # instructor solution    
-    safe_mkdir(f"{q_root}/suites/solution")
+    safe_mkdir(f"{q_root}/tests/solution")
     write_solution(q_root, solution)
 
     # load common files
     common = content['common']
-    safe_mkdir(f"{q_root}/suites/common")
-    # TODO: f"cp -r {commmon}/* suites/common"
+    safe_mkdir(f"{q_root}/tests/common")
+    os.system(f"cp -r {common}/* {q_root}/tests/common/")
 
     # load mutations (if any)
     mutations = content.get('mutations', [])
-    generate_mutation_suites(q_root, mutations)
+    generate_mutations(q_root, mutations)
 
     # load metadata (like what file the submission maps to)
     write_metadata(q_root, content['submit_to'])
