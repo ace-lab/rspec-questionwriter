@@ -1,0 +1,55 @@
+prompt: |
+  You can write any multiline question here and newlines will be preserved.
+  One condition: you must be indented once further than the starting tag.
+common: app/ # this is the directory to a completed app, this will go into suites/common/
+submit_to: app/spec/func_spec.rb # this is where _submission_file will append to when running suites
+solution: | # this is the code which will be FPP-ed by Logan's script and have all questionmarks removed for _submission_file
+  def det(a, b, c, d): #0given
+    """Calculates the determinant of a 2x2 matrix"""
+    return ?a * c + b * d?
+mutations:
+  suite1:
+    - common/path/file_a.rb:
+      - 1-5: |
+          code
+          code
+      - 5-6: |
+          code
+          code
+      - 7-9: |
+          code
+          code
+    - common/path/file_c.rb:
+      - 2-5: |
+          code
+          code
+  suite2:
+    - common/path/file_a.rb:
+      - 1-5: |
+          code
+          code
+      - 5-6: |
+          code
+          code
+      - 7-9: |
+          code
+          code
+    - common/path/file_c.rb:
+      - 2-5: |
+          code
+          code
+  suite3:
+    - common/path/file_a.rb:
+      - 1-5: |
+          code
+          code
+      - 5-6: |
+          code
+          code
+      - 7-9: |
+          code
+          code
+    - common/path/file_c.rb:
+      - 2-5: |
+          code
+          code 
