@@ -9,47 +9,25 @@ solution: | # this is the code which will be FPP-ed by Logan's script and have a
     return ?a * c + b * d?
 mutations:
   suite1:
-    common/path/file_a.rb:
-      1-5: |
-        code
-        code
-      5-6: |
-        code
-        code
-      7-9: |
-        code
-        code
-    common/path/file_c.rb:
-      2-5: |
-        code
-        code
+    funcs.rb:
+      19-20: |
+        !(inc(n) % 2 == 0)
+    Gemfile:
+      1-2: |
+        gem 'some_other_gem'
   suite2:
-    common/path/file_a.rb:
-      1-5: |
-        code
-        code
-      5-6: |
-        code
-        code
-      7-9: |
-        code
-        code
-    common/path/file_c.rb:
-      2-5: |
-        code
-        code
+    funcs.rb:
+      19-20: |
+        n % 2 == 1
+    Gemfile:
+      2-3: |
+        gem 'suite2__gem'
   suite3:
-    common/path/file_a.rb:
-      1-5: |
-        code
-        code
-      5-6: |
-        code
-        code
-      7-9: |
-        code
-        code
-    common/path/file_c.rb:
-      2-5: |
-        code
-        code 
+    funcs.rb:
+      1-2: |
+        # a comment to show that it exists
+      19-20: |
+        !(inc(n) % 2 == 0)
+    Gemfile:
+      1-2: |
+        gem 'som_s3_gem'

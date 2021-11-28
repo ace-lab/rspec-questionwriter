@@ -44,15 +44,14 @@ def generate_mutations(q_root: str, mutations: Dict):
         last = intervals[0]
         for intv in intervals[1:]:
             if intv[1] < last[1]:
-                return False
-        return True
+                return True
+        return False
 
     for suite, files in mutations.items():
         safe_mkdir(f"{q_root}/tests/{suite}")
 
         for file, mutations in files.items():
             line = 1
-
 
             locations = map(
                 lambda i: i.split('-'), 
@@ -65,22 +64,31 @@ def generate_mutations(q_root: str, mutations: Dict):
             locations = sorted(list(locations), key=(lambda e: e[0]))
 
             if overlaps(locations):
+                print(f"Invalid ranges for {file} in {suite}")
                 clean_up()
 
-            with open(file, 'r') as inp:
-                with open(file, 'w') as out:
+            in_file = f"{q_root}/tests/common/{file}"
+            out_file = f"{q_root}/tests/{suite}/{file}"
+            with open(in_file, 'r') as inp:
+                with open(out_file, 'w') as out:
 
                     for location in locations:
-                        code = file[f"{location[0]}-{location[1]}"]
+                        code = mutations[f"{location[0]}-{location[1]}"]
+                        if code[-1] != '\n':
+                            code += '\n'
 
                         # copy over content before the interval
                         if line < location[0]:
-                            out.write(inp.readline(location[0] - line))
+                            for i in range(location[0] - line):
+                                out.writelines(inp.readline())
 
                         # skip over content in the interval
-                        inp.readline(location[1] - location[0])
+                        for i in range(location[1] - location[0]):
+                            inp.readline()
                         # insert new content in the interval
-                        out.write(inp.readline(code))
+                        out.write(code)
+
+                        line = location[1]
                     
                     # add back in everything following the mutations
                     out.writelines(inp.readlines())
@@ -116,26 +124,31 @@ if __name__ == "__main__":
     solution: str = content["solution"]
     make_parson_source(q_root, prompt, solution, q_name)
     
-    # should include ans.py, question.html
+    print(f"Running FPP generator")
     os.system(f"/usr/bin/python3 generate_fpp.py {argv[2]}/{q_name}.py")
+    os.system(f"rm {argv[2]}/{q_name}.py")
 
-    print("fpp done")
+    print(f"- Overwriting info.json")
     write_to(f"{q_root}/info.json", base_info_json)
 
     safe_mkdir(f"{q_root}/tests")
 
     # instructor solution    
+    print(f"- Preparing solution")
     safe_mkdir(f"{q_root}/tests/solution")
     write_solution(q_root, solution)
 
     # load common files
+    print(f"- Loading common files")
     common = content['common']
     safe_mkdir(f"{q_root}/tests/common")
     os.system(f"cp -r {common}/* {q_root}/tests/common/")
 
     # load mutations (if any)
+    print(f"- Producing mutations")
     mutations = content.get('mutations', [])
     generate_mutations(q_root, mutations)
 
     # load metadata (like what file the submission maps to)
+    print(f"- Writing grader metadata")
     write_metadata(q_root, content['submit_to'])
