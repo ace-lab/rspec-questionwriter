@@ -9,6 +9,3 @@ mutations:
     funcs.rb:
       19-20: |
         !(inc(n) % 2 == 0)
-    Gemfile:
-      1-2: |
-        gem 'some_other_gem'
