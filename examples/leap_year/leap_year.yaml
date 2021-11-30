@@ -1,0 +1,28 @@
+submit_to: spec/funcs_spec.rb
+common: app/
+prompt: |
+  RSpec gives developers the tools to validate code 
+  automatically. In this exercise, you will be introduced
+  to <code>describe</code>, <code>expect</code>, and 
+  <code>to_be</code>. <br><br>
+  
+  Given a function <code>leap_year</code> that takes one 
+  argument that "quacks" like an Integer and returns an
+  object that quacks like a Boolean, write a test that
+  validates that 2004 is 
+  a leap year.
+solution: |
+  describe 'leap_year' do
+      it 'should return true on 2004 [00]' do
+          ?expect?(leap_year(2004)).?to? eq(?true?)
+      end
+  end
+mutations:
+  suite0:
+    funcs.rb:
+      3-4: |
+            year % 4 == 0
+  suite1:
+    funcs.rb:
+      3-4: |
+            year % 400 == 0
