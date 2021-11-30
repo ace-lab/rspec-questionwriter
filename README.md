@@ -1,5 +1,21 @@
 # rspec-questionwriter
 
-1. In the app directory write the ruby app that you want students to test
-2. Use question.yaml to write the question and specify the mutations, look at example.yaml for an example of how this is done
-3. Run suites_gen.py to create the appropraite directorys for PrairieLearn
+## Usage
+```
+usage: suites_gen.py [yaml path] [destination]
+```
+
+## Quickstart
+`suites_gen.py` calls `generate_fpp.py` and various scripts in `lib/`, do not separate these.
+
+To generate a question, you must first write a general ruby application in a directory and then write the metadata required for the question in a yaml file.
+
+For example, if we have some app in `<dir>/` and would like to generate a question utilizing it, we should write in a file named `<question_name>.yaml`.
+This file should include:
+- the directory the app is in (`common:`)
+- the prompt of the question (`prompt:`)
+- the file that a student submission would be written to (`submit_to:`)
+- the solution (`solution:`)
+- and all mutations, heirarchially sorted by suite (`mutations:`)
+
+An example can be seen in the `examples/` directory
