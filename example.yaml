@@ -5,8 +5,8 @@ submit_to: app/spec/func_spec.rb # this is where _submission_file will append to
 solution: | # this is the code which will be FPP-ed by Logan's script and have all questionmarks removed for _submission_file
   describe functions do
     it "Even function" do
-      expect(even(1)).to eq False
-      expect(even(2)).to eq True
+      ?expect(even(1)).to eq False?
+      ?expect(even(2)).to eq True?
     end
   end
 mutations:
