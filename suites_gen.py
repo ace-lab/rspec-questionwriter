@@ -109,11 +109,12 @@ def clean_up() -> None:
 
 if __name__ == "__main__":
     # q_root = argv[1]
-    yaml_file = argv[1]
+    yaml_path = argv[1]
+    yam_file = os.path.basename(yaml_path)
     q_name = yaml_file[:yaml_file.index('.')]
     q_root = f"{argv[2]}/{q_name}/"
 
-    content: Dict[str, Any] = yaml.safe_load(open(f"{yaml_file}"))
+    content: Dict[str, Any] = yaml.safe_load(open(f"{yaml_path}"))
 
     assert "solution" in content.keys(), f"`solution:` is a required field in question.yaml"
     assert "common" in content.keys(), f"`common:` is a required field in question.yaml"
