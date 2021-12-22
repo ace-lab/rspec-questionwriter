@@ -1,6 +1,5 @@
 prompt: |
   This is an example question. Write a test for the even function. 
-common: app/ # this is the directory to a completed app, this will go into suites/common/
 submit_to: app/spec/func_spec.rb # this is where _submission_file will append to when running suites
 solution: | # this is the code which will be FPP-ed by Logan's script and have all questionmarks removed for _submission_file
   describe functions do

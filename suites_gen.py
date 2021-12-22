@@ -1,3 +1,4 @@
+#!/usr/bin/python3.9
 from typing import Any, Dict, List, Tuple
 import yaml
 from json import dumps as json_dumps
@@ -110,14 +111,14 @@ def clean_up() -> None:
 if __name__ == "__main__":
     # q_root = argv[1]
     yaml_path = argv[1]
-    yam_file = os.path.basename(yaml_path)
+    yaml_file = os.path.basename(yaml_path)
     q_name = yaml_file[:yaml_file.index('.')]
     q_root = f"{argv[2]}/{q_name}/"
+    common = argv[3]
 
     content: Dict[str, Any] = yaml.safe_load(open(f"{yaml_path}"))
 
     assert "solution" in content.keys(), f"`solution:` is a required field in question.yaml"
-    assert "common" in content.keys(), f"`common:` is a required field in question.yaml"
     assert "submit_to" in content.keys(), f"`submit_to:` is a required field in question.yaml"
     # the other two fields are normally "mutations" and ""
 
@@ -126,7 +127,7 @@ if __name__ == "__main__":
     make_parson_source(q_root, prompt, solution, q_name)
     
     print(f"Running FPP generator")
-    os.system(f"/usr/bin/python3 generate_fpp.py {argv[2]}/{q_name}.py")
+    os.system(f"/usr/bin/python3.9 generate_fpp.py {argv[2]}/{q_name}.py")
     os.system(f"rm {argv[2]}/{q_name}.py")
 
     print(f"- Overwriting info.json")
@@ -141,7 +142,6 @@ if __name__ == "__main__":
 
     # load common files
     print(f"- Loading common files")
-    common = content['common']
     safe_mkdir(f"{q_root}/tests/common")
     os.system(f"cp -r {common}/* {q_root}/tests/common/")
 

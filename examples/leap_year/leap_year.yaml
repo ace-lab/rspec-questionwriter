@@ -1,5 +1,4 @@
 submit_to: spec/funcs_spec.rb
-common: app/
 prompt: |
   RSpec gives developers the tools to validate code 
   automatically. In this exercise, you will be introduced

@@ -2,7 +2,7 @@
 
 ## Usage
 ```
-usage: suites_gen.py [yaml path] [destination]
+usage: suites_gen.py [yaml path] [destination] [application path]
 ```
 
 ## Quickstart
@@ -12,7 +12,6 @@ To generate a question, you must first write a general ruby application in a dir
 
 For example, if we have some app in `<dir>/` and would like to generate a question utilizing it, we should write in a file named `<question_name>.yaml`.
 This file should include:
-- the directory the app is in (`common:`)
 - the prompt of the question (`prompt:`)
 - the file that a student submission would be written to (`submit_to:`)
 - the solution (`solution:`)
