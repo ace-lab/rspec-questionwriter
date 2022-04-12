@@ -38,9 +38,8 @@ def make_parson_source(q_root: str, prompt: str, solution: str, q_name: str) -> 
 \n
 """
     write_to(f"{argv[2]}/{q_name}.py", source)
-        
-def generate_mutations(q_root: str, mutations: Dict):
 
+def apply_mutation(filename: str, mutations: str, variant_name: str) -> None:
     def overlaps(intervals: Tuple[int, int]) -> bool:
         last = intervals[0]
         for intv in intervals[1:]:
@@ -48,51 +47,56 @@ def generate_mutations(q_root: str, mutations: Dict):
                 return True
         return False
 
-    for suite, files in mutations.items():
-        safe_mkdir(f"{q_root}/tests/{suite}")
+    line = 1
+
+    locations = map(
+        lambda i: i.split('-'), 
+        mutations.keys()
+    )
+    locations = map( # basically 'num1-num2' -> { (num1,num2): 'num1-num2', ...}
+        lambda intv: (int(intv[0]), int(intv[1])),
+        locations
+    )
+    locations = sorted(list(locations), key=(lambda e: e[0]))
+
+    if overlaps(locations):
+        print(f"Invalid ranges for {filename} in {variant_name}")
+        clean_up()
+
+    in_file = f"{q_root}/tests/common/{filename}"
+    out_file = f"{q_root}/tests/{variant_name}/{filename}"
+    with open(in_file, 'r') as inp:
+        with open(out_file, 'w') as out:
+
+            for location in locations:
+                code = mutations[f"{location[0]}-{location[1]}"]
+                if code[-1] != '\n':
+                    code += '\n'
+
+                # copy over content before the interval
+                if line < location[0]:
+                    for i in range(location[0] - line):
+                        out.writelines(inp.readline())
+
+                # skip over content in the interval
+                for i in range(location[1] - location[0]):
+                    inp.readline()
+                # insert new content in the interval
+                out.write(code)
+
+                line = location[1]
+            
+            # add back in everything following the mutations
+            out.writelines(inp.readlines())
+      
+def generate_variants(q_root: str, variants: Dict):
+
+    # each suite has a set of mutations
+    for variant, files in variants.items():
+        safe_mkdir(f"{q_root}/tests/{variant}")
 
         for file, mutations in files.items():
-            line = 1
-
-            locations = map(
-                lambda i: i.split('-'), 
-                mutations.keys()
-            )
-            locations = map( # basically 'num1-num2' -> { (num1,num2): 'num1-num2', ...}
-                lambda intv: (int(intv[0]), int(intv[1])),
-                locations
-            )
-            locations = sorted(list(locations), key=(lambda e: e[0]))
-
-            if overlaps(locations):
-                print(f"Invalid ranges for {file} in {suite}")
-                clean_up()
-
-            in_file = f"{q_root}/tests/common/{file}"
-            out_file = f"{q_root}/tests/{suite}/{file}"
-            with open(in_file, 'r') as inp:
-                with open(out_file, 'w') as out:
-
-                    for location in locations:
-                        code = mutations[f"{location[0]}-{location[1]}"]
-                        if code[-1] != '\n':
-                            code += '\n'
-
-                        # copy over content before the interval
-                        if line < location[0]:
-                            for i in range(location[0] - line):
-                                out.writelines(inp.readline())
-
-                        # skip over content in the interval
-                        for i in range(location[1] - location[0]):
-                            inp.readline()
-                        # insert new content in the interval
-                        out.write(code)
-
-                        line = location[1]
-                    
-                    # add back in everything following the mutations
-                    out.writelines(inp.readlines())
+            apply_mutation(file, mutations, variant)
 
 def write_solution(q_root: str, solution: str) -> None:
     """Generate tests/solution/_submission_file using the provided solution"""
@@ -148,7 +152,7 @@ if __name__ == "__main__":
     # load mutations (if any)
     print(f"- Producing mutations")
     mutations = content.get('mutations', [])
-    generate_mutations(q_root, mutations)
+    generate_variants(q_root, mutations)
 
     # load metadata (like what file the submission maps to)
     print(f"- Writing grader metadata")
