@@ -1,4 +1,5 @@
 #!/usr/bin/python3.9
+from subprocess import run, PIPE
 from typing import Any, Dict, List, Tuple
 import yaml
 from json import dumps as json_dumps
@@ -40,6 +41,7 @@ def make_parson_source(q_root: str, prompt: str, solution: str, q_name: str) -> 
     write_to(f"{argv[2]}/{q_name}.py", source)
 
 def apply_mutation(filename: str, mutations: str, variant_name: str) -> None:
+    raise NotImplementedError("bleh")
     def overlaps(intervals: Tuple[int, int]) -> bool:
         last = intervals[0]
         for intv in intervals[1:]:
@@ -89,6 +91,20 @@ def apply_mutation(filename: str, mutations: str, variant_name: str) -> None:
             # add back in everything following the mutations
             out.writelines(inp.readlines())
       
+def apply_mutation(q_root: str, mutations: str, filename: str, variant_name: str) -> bytes:
+    """runs `patch` on the filename with patchfile input `mutations` and returns stderr as bytes"""
+    in_file = f"{q_root}/tests/common/{filename}"
+    out_file = f"{q_root}/tests/{variant_name}/{filename}"
+
+    command = [
+        "patch",
+        "-o", out_file,
+        in_file,
+    ]
+
+    error_out = run(command, input=mutations.encode(), check=True, stderr=PIPE).stderr
+    return error_out
+
 def generate_variants(q_root: str, variants: Dict):
 
     # each suite has a set of mutations
@@ -96,7 +112,9 @@ def generate_variants(q_root: str, variants: Dict):
         safe_mkdir(f"{q_root}/tests/{variant}")
 
         for file, mutations in files.items():
-            apply_mutation(file, mutations, variant)
+            err: bytes = apply_mutation(q_root, mutations, file, variant).decode("utf-8")
+            if len(err) > 0: # make sure to swap file and mutations args
+                raise RuntimeError(f"Unexpected error when applying mutation to {file} in variant {variant}: \n{err}")
 
 def write_solution(q_root: str, solution: str) -> None:
     """Generate tests/solution/_submission_file using the provided solution"""

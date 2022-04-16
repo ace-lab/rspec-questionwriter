@@ -10,6 +10,8 @@ solution: | # this is the code which will be FPP-ed by Logan's script and have a
   end
 mutations:
   suite1:
-    funcs.rb:
-      19-20: |
-        !(inc(n) % 2 == 0)
+    funcs.rb: |
+      19c19
+      <     n % 2 == 0
+      ---
+      >     !(inc(n) % 2 == 0)

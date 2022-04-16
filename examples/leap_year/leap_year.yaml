@@ -18,10 +18,14 @@ solution: |
   end
 mutations:
   suite0:
-    funcs.rb:
-      3-4: |
-            year % 4 == 0
+    funcs.rb: |
+      3c3
+      <     return year % 400 == 0 || ((year % 4 == 0) && !(year % 100 == 0))
+      ---
+      >     year % 4 == 0
   suite1:
-    funcs.rb:
-      3-4: |
-            year % 400 == 0
+    funcs.rb: |
+      3c3
+      <     return year % 400 == 0 || ((year % 4 == 0) && !(year % 100 == 0))
+      ---
+      >     year % 400 == 0
