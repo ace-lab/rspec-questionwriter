@@ -1,0 +1,15 @@
+=== 5.0.0 / 2019-05-26
+
+* 1 minor enhancement:
+
+  * Switched to point to minitest-autotest.
+
+* 1 bug fix:
+
+  * Removed dead rubyforge setting in Rakefile
+
+=== 4.4.6 / 2010-12-01
+
+* 1 major enhancement:
+  * This release deprecates/retires this gem and brings autotest back
+    under ZenTest.

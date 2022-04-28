@@ -1,0 +1,19 @@
+current directory: /home/nalsoon/Downloads/rspec-questionwriter/rottenpotatoes-bdd-demo/vendor/bundle/ruby/2.6.0/gems/byebug-11.1.3/ext/byebug
+/home/nalsoon/.rbenv/versions/2.6.10/bin/ruby -I /home/nalsoon/.rbenv/versions/2.6.10/lib/ruby/2.6.0 -r ./siteconf20220427-129480-bmn29a.rb extconf.rb
+creating Makefile
+
+current directory: /home/nalsoon/Downloads/rspec-questionwriter/rottenpotatoes-bdd-demo/vendor/bundle/ruby/2.6.0/gems/byebug-11.1.3/ext/byebug
+make "DESTDIR=" clean
+
+current directory: /home/nalsoon/Downloads/rspec-questionwriter/rottenpotatoes-bdd-demo/vendor/bundle/ruby/2.6.0/gems/byebug-11.1.3/ext/byebug
+make "DESTDIR="
+compiling breakpoint.c
+compiling byebug.c
+compiling context.c
+compiling locker.c
+compiling threads.c
+linking shared-object byebug/byebug.so
+
+current directory: /home/nalsoon/Downloads/rspec-questionwriter/rottenpotatoes-bdd-demo/vendor/bundle/ruby/2.6.0/gems/byebug-11.1.3/ext/byebug
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 byebug.so ./.gem.20220427-129480-uo6lmv/byebug
