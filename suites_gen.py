@@ -1,6 +1,6 @@
 #!/usr/bin/python3.9
 from subprocess import run, PIPE
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict
 import yaml
 from json import dumps as json_dumps
 from sys import argv
@@ -39,58 +39,7 @@ def make_parson_source(q_root: str, prompt: str, solution: str, q_name: str) -> 
 \n
 """
     write_to(f"{argv[2]}/{q_name}.py", source)
-
-def apply_mutation(filename: str, mutations: str, variant_name: str) -> None:
-    raise NotImplementedError("bleh")
-    def overlaps(intervals: Tuple[int, int]) -> bool:
-        last = intervals[0]
-        for intv in intervals[1:]:
-            if intv[1] < last[1]:
-                return True
-        return False
-
-    line = 1
-
-    locations = map(
-        lambda i: i.split('-'), 
-        mutations.keys()
-    )
-    locations = map( # basically 'num1-num2' -> { (num1,num2): 'num1-num2', ...}
-        lambda intv: (int(intv[0]), int(intv[1])),
-        locations
-    )
-    locations = sorted(list(locations), key=(lambda e: e[0]))
-
-    if overlaps(locations):
-        print(f"Invalid ranges for {filename} in {variant_name}")
-        clean_up()
-
-    in_file = f"{q_root}/tests/common/{filename}"
-    out_file = f"{q_root}/tests/{variant_name}/{filename}"
-    with open(in_file, 'r') as inp:
-        with open(out_file, 'w') as out:
-
-            for location in locations:
-                code = mutations[f"{location[0]}-{location[1]}"]
-                if code[-1] != '\n':
-                    code += '\n'
-
-                # copy over content before the interval
-                if line < location[0]:
-                    for i in range(location[0] - line):
-                        out.writelines(inp.readline())
-
-                # skip over content in the interval
-                for i in range(location[1] - location[0]):
-                    inp.readline()
-                # insert new content in the interval
-                out.write(code)
-
-                line = location[1]
-            
-            # add back in everything following the mutations
-            out.writelines(inp.readlines())
-      
+    
 def apply_mutation(q_root: str, mutations: str, filename: str, variant_name: str) -> bytes:
     """runs `patch` on the filename with patchfile input `mutations` and returns stderr as bytes"""
     in_file = f"{q_root}/tests/common/{filename}"
@@ -102,7 +51,7 @@ def apply_mutation(q_root: str, mutations: str, filename: str, variant_name: str
         in_file,
     ]
 
-    error_out = run(command, input=mutations.encode(), check=True, stderr=PIPE).stderr
+    error_out = run(command, input=mutations.encode(), stderr=PIPE).stderr
     return error_out
 
 def generate_variants(q_root: str, variants: Dict):
@@ -112,6 +61,7 @@ def generate_variants(q_root: str, variants: Dict):
         safe_mkdir(f"{q_root}/tests/{variant}")
 
         for file, mutations in files.items():
+            os.makedirs(os.path.dirname(f"{q_root}/tests/{variant}/{file}"), exist_ok=True)
             err: bytes = apply_mutation(q_root, mutations, file, variant).decode("utf-8")
             if len(err) > 0: # make sure to swap file and mutations args
                 raise RuntimeError(f"Unexpected error when applying mutation to {file} in variant {variant}: \n{err}")
@@ -131,7 +81,7 @@ def clean_up() -> None:
     exit(1)
 
 if __name__ == "__main__":
-    # q_root = argv[1]
+    assert len(argv) > 3, "USAGE: suites_gen.py <question_data.yaml> <destination> <application root>"
     yaml_path = argv[1]
     yaml_file = os.path.basename(yaml_path)
     q_name = yaml_file[:yaml_file.index('.')]
@@ -149,7 +99,7 @@ if __name__ == "__main__":
     make_parson_source(q_root, prompt, solution, q_name)
     
     print(f"Running FPP generator")
-    os.system(f"/usr/bin/python3.9 generate_fpp.py {argv[2]}/{q_name}.py")
+    os.system(f"python generate_fpp.py {argv[2]}/{q_name}.py")
     os.system(f"rm {argv[2]}/{q_name}.py")
 
     print(f"- Overwriting info.json")
