@@ -3,7 +3,7 @@
 ## Important
 
 - `suites_gen.py` calls `generate_fpp.py` and various scripts in `lib/`, do not separate these.
-- This script currently only supports systems that have UNIX `cp`, `rm`, and `mkdir` commands added to their `$PATH`.
+- This script currently only supports systems that have UNIX `cp`, `rm`, `mkdir`, and `patch` commands added to their `$PATH`.
 
 ## Usage
 ```
@@ -11,7 +11,8 @@ usage: suites_gen.py [yaml path] [destination] [application path]
 ```
 
 ## Todo
-- put this processing in the autograder to avoid a mess with python versions  
+- package this into a python module to avoid the working directory constraint
+- put this processing in the autograder to avoid a mess with python versions
   
 
 ## Quickstart
@@ -27,7 +28,7 @@ This file should include:
 - and all mutations, heirarchially sorted by suite (`mutations:`)
 
 Examples can be seen in the `examples/` directory.  
-To run an example on a system with `python3` installed, navigate to the directory that contains the application you would like to create a question out of and run the command above. For example, after cloning this repository, to make the `leap_year` question on a system with `/usr/bin/python3.9`:
+To generate example question files on a system with `python3` installed, navigate to this project's root directory and run the command above. For example, after cloning this repository, to make the `leap_year` example question on a system with `/usr/bin/python3.9`:
 ```
 .../rspec-questionwriter $ mkdir examples/questions
 .../rspec-questionwriter $ ./suites_gen.py examples/leap_year/leap_year.yaml examples/questions examples/leap_year/app/
