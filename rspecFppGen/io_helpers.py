@@ -1,4 +1,4 @@
-from os import getcwd, listdir, makedirs, PathLike
+from os import getcwd, listdir, makedirs
 from argparse import *
 from os.path import *
 from typing import *
@@ -7,7 +7,7 @@ from functools import partial
 
 
 
-from lib.consts import Bcolors, PROGRAM_DESCRIPTION
+from consts import Bcolors, PROGRAM_DESCRIPTION
 
 
 def file_name(file_path) -> AnyStr:
