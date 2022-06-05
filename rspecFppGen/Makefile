@@ -1,10 +1,13 @@
 
 default: package
 
+install:
+	make clean
+	make package
+	pip install dist/rspecFppGe*.tar.gz
+
 package:
 	python setup.py sdist
-	cp dist/rspecFppGe*.tar.gz ../
 
 clean:
 	rm -rf dist rspecFppGen.egg-info || true
-	rm -rf ../rspecFppGe*.tar.gz
