@@ -1,2 +1,4 @@
 __pycache__
 examples/questions
+dist/
+*.egg-info/

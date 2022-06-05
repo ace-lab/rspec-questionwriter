@@ -1,4 +1,3 @@
-#!/usr/bin/python3.9
 from subprocess import run, PIPE
 from typing import Any, Dict
 import yaml
@@ -80,8 +79,11 @@ def clean_up() -> None:
     # TODO: remove all files and make it look like we were never here
     exit(1)
 
-if __name__ == "__main__":
-    assert len(argv) > 3, "USAGE: suites_gen.py <question_data.yaml> <destination> <application root>"
+def main():
+    if len(argv) <= 3:
+        print(f"USAGE: {argv[0]} <question_data.yaml> <destination> <application root>")
+        exit(1)
+
     yaml_path = argv[1]
     yaml_file = os.path.basename(yaml_path)
     q_name = yaml_file[:yaml_file.index('.')]
@@ -99,7 +101,12 @@ if __name__ == "__main__":
     make_parson_source(q_root, prompt, solution, q_name)
     
     print(f"Running FPP generator")
-    os.system(f"python generate_fpp.py {argv[2]}/{q_name}.py")
+    import generate_fpp
+    args = generate_fpp.parse_args([f"{argv[2]}/{q_name}.py"])
+    if args.profile:
+        generate_fpp.profile_generate_many(args)
+    else:
+        generate_fpp.generate_many(args)
     os.system(f"rm {argv[2]}/{q_name}.py")
 
     print(f"- Overwriting info.json")
@@ -125,3 +132,6 @@ if __name__ == "__main__":
     # load metadata (like what file the submission maps to)
     print(f"- Writing grader metadata")
     write_metadata(q_root, content['submit_to'])
+
+if __name__ == "__main__":
+    main()
