@@ -2,16 +2,16 @@ from typing import *
 
 from collections import defaultdict, namedtuple
 from json import dumps
-from os import path, PathLike
+from os import path
 from re import finditer, match as test
 from shutil import copyfile
 from uuid import uuid4
 from functools import partial
 
-from lib.consts import MAIN_PATTERN, SPECIAL_COMMENT_PATTERN, \
+from consts import MAIN_PATTERN, SPECIAL_COMMENT_PATTERN, \
     BLANK_SUBSTITUTE, SETUP_CODE_DEFAULT, TEST_DEFAULT, REGION_IMPORT_PATTERN
-from lib.name_visitor import generate_server, AnnotatedName
-from lib.io_helpers import Bcolors, resolve_path, file_name, \
+from name_visitor import generate_server, AnnotatedName
+from io_helpers import Bcolors, resolve_path, file_name, \
     make_if_absent, write_to, file_ext, Namespace, parse_args, \
     auto_detect_sources, read_region_source_lines
 
