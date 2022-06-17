@@ -1,27 +1,17 @@
-class InsufficientFundsError < StandardError
-end
-
 class Wallet
-    attr_reader :cash # not attr_accessor
-      # need a way to add money for Wallet tests
+    attr_reader :cash
     def initialize(amount)
-      raise ArgumentError if amount <= 0
       @cash = amount
     end
     def withdraw(amount)
-       raise InsufficientFundsError if amount > @cash
-       raise ArgumentError if amount <= 0
        @cash -= amount
-       amount
     end
   end
 
 class Customer
-  # no # attr_accessor :wallet
   def initialize(wallet)
     @wallet = wallet
   end
-  # behavior delegation
   def pay(amount)
     @wallet.withdraw(amount)
   end
