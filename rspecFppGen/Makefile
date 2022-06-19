@@ -1,13 +1,22 @@
 
+ifeq (, $(shell which python3))
+ifeq (, $(shell which python))
+$(error "No python or python3 in $(PATH)")
+endif
+pyPath = $(shell which python)
+else
+pyPath = $(shell which python3)
+endif
+
 default: package
 
 install:
 	make clean
 	make package
-	pip install dist/rspecFppGe*.tar.gz
+	$(pyPath) -m pip install dist/rspecFppGe*.tar.gz
 
 package:
-	python setup.py sdist
+	$(pyPath) setup.py sdist
 
 clean:
 	rm -rf dist rspecFppGen.egg-info || true
