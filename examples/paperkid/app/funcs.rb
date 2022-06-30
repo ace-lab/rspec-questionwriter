@@ -1,6 +1,3 @@
-class InsufficientFundsError < StandardError
-end
-
 class Wallet
     attr_reader :cash 
     def initialize(amount)
