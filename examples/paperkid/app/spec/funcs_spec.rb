@@ -8,17 +8,19 @@ describe 'PaperKid tests' do
     end
     describe 'money collection' do
         it 'should call pay method of Customer' do
-            @pk = PaperKid.new
-            @customer_dbl = double("Customer")
-            expect(@customer_dbl).to receive(:pay).with(10).and_return(10)
-            @pk.collect_money(@customer_dbl, 10)
+            pk = PaperKid.new
+            customer_dbl = double("Customer")
+            amount = 10
+            expect(customer_dbl).to receive(:pay).with(amount).and_return(amount)
+            pk.collect_money(customer_dbl, amount)
         end
         it 'should increment collected amount' do
-            @pk = PaperKid.new
-            @customer_dbl = double("Customer")
-            allow(@customer_dbl).to receive(:pay).with(10).and_return(10)
-            @pk.collect_money(@customer_dbl, 10)
-            expect(@pk.collected_amount).to eq(10)
+            pk = PaperKid.new
+            customer_dbl = double("Customer")
+            amount = 10
+            allow(customer_dbl).to receive(:pay).with(amount).and_return(amount)
+            pk.collect_money(customer_dbl, amount)
+            expect(pk.collected_amount).to eq(amount)
         end
     end
 end
