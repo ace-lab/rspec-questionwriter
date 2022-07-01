@@ -14,7 +14,7 @@ describe 'Wallet Tests' do
         it 'should have cash set by constructor' do
             amount = 20
             wallet = Wallet.new(amount)
-            expect(wallet.cash).to eq(20)
+            expect(wallet.cash).to eq(amount)
         end
         it 'should not have a cash setter method' do
             wallet = Wallet.new(10)
