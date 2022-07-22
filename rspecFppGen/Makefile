@@ -10,10 +10,17 @@ endif
 
 default: package
 
+ensurepip:
+	$(pyPath) -m ensurepip --upgrade
+
 install:
 	make clean
+	make ensurepip
 	make package
 	$(pyPath) -m pip install dist/rspecFppGe*.tar.gz
+
+uninstall:
+	$(pyPath) -m pip uninstall rspecFppGen
 
 package:
 	$(pyPath) setup.py sdist
