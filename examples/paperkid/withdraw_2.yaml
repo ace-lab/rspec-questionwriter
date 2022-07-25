@@ -1,0 +1,57 @@
+submit_to: spec/funcs_spec.rb
+prompt: |
+  Formulate a second test to verify that <code>withdraw</code> properly
+  rejects an invalid withdraw request for too much cash. Study the 
+  system under test to determine proper behavior. <br><br>
+  
+  System Under Test:
+  <pl-code language="ruby">
+    def withdraw(amount)
+       raise InsufficientFundsError if amount &gt; @cash
+       raise ArgumentError if amount &lt; 0
+       @cash -= amount
+       amount
+    end
+  </pl-code>
+
+  Reference Test from Previous Exercise:
+  <pl-code>
+    describe 'withdraw' do
+      it 'should remove valid amount' do
+          amount = 20
+          amount_to_remove = 10
+          wallet = Wallet.new(amount)
+          expect{ wallet.withdraw(amount_to_remove) }.not_to raise_error
+          expect(wallet.cash).to eq(amount - amount_to_remove)
+      end
+    end
+  </pl-code>
+
+solution: |
+  describe 'Wallet Tests' do
+    describe 'withdraw' do
+      it 'should not withdraw too much' do
+        amount = 20
+        wallet = Wallet.new(amount)
+        ?expect?{ wallet.withdraw(amount + 1) }.to ?raise_error?(InsufficientFundsError)
+        ?expect?( wallet.cash ).to ?eq?(amount)
+      end
+    end
+  end
+
+TODO:
+  simple mutations on SUT, use diff, operators, etc., change exception type, remove returns, etc.
+
+mutations:
+  var_1:
+    funcs.rb: |
+      12c12
+      <        raise ArgumentError if amount <= 0
+      ---
+      >        raise ArgumentError if amount > 0
+  var_2:
+    funcs.rb: |
+      13c13
+      <        @cash -= amount
+      ---
+      >        @cash += amount

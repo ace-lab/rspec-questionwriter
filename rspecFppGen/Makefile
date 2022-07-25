@@ -7,7 +7,7 @@ install:
 	pip install dist/rspecFppGe*.tar.gz
 
 package:
-	python setup.py sdist
+	python3 setup.py sdist
 
 clean:
 	rm -rf dist rspecFppGen.egg-info || true
