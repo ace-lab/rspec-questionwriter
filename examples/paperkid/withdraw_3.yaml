@@ -34,14 +34,12 @@ prompt: |
   </pl-code>
 
 solution: |
-  describe 'Wallet Tests' do
-    describe 'withdraw' do
-      it 'should not withdraw negative money' do
-        amount = 20
-        wallet = Wallet.new(amount)
-        expect{ wallet.withdraw(-1 * amount) }.to raise_error(ArgumentError)
-        expect( wallet.cash ).to eq(amount)
-      end
+  describe 'withdraw' do
+    it 'should not withdraw negative money' do
+      amount = 20
+      wallet = Wallet.new(amount)
+      expect{ wallet.withdraw(-1 * amount) }.to raise_error(ArgumentError)
+      expect( wallet.cash ).to eq(amount)
     end
   end
 
@@ -52,15 +50,15 @@ mutations:
   var_1:
     funcs.rb: |
       12c12
-      <        raise ArgumentError if amount <= 0
+      <       raise ArgumentError if amount < 0
       ---
-      >        raise ArgumentError if amount > 0
+      >       raise ArgumentError if amount > 0
   var_2:
     funcs.rb: |
       13c13
-      <        @cash -= amount
+      <       @cash -= amount
       ---
-      >        @cash += amount
+      >       @cash += amount
   var_3:
     funcs.rb: |
       11c11

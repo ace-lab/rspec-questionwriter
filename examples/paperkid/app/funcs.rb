@@ -8,10 +8,10 @@ class Wallet
       @cash = amount
     end
     def withdraw(amount)
-       raise InsufficientFundsError if amount > @cash
-       raise ArgumentError if amount < 0
-       @cash -= amount
-       return amount
+      raise InsufficientFundsError if amount > @cash
+      raise ArgumentError if amount < 0
+      @cash -= amount
+      return amount
     end
   end
 
