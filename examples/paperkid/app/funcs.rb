@@ -11,7 +11,7 @@ class Wallet
        raise InsufficientFundsError if amount > @cash
        raise ArgumentError if amount < 0
        @cash -= amount
-       amount
+       return amount
     end
   end
 

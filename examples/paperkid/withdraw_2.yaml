@@ -55,3 +55,9 @@ mutations:
       <        @cash -= amount
       ---
       >        @cash += amount
+  var_3:
+    funcs.rb: |
+      11c11
+      <       raise InsufficientFundsError if amount > @cash
+      ---
+      >       raise InsufficientFundsError if amount <= @cash
