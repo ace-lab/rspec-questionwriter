@@ -6,18 +6,18 @@
 
 ## Usage
 ```
-usage: python3 -m rsepcFppGen [yaml path] [destination] [application path]
+usage: python3 -m rsepcFppGen <destination> <application path> <yaml path> [<yaml path 2>] [<yaml path 3>] [...] [<yaml path n>]
 ```
 
 ## Todo
 - put this processing in the autograder to avoid a mess with python versions
-  
+
 
 ## Quickstart
 
 To generate a question, you must first write a general ruby application in a directory and then write the metadata required for the question in a yaml file.
 
-If we have some app in `<dir>/` and would like to generate a question utilizing it, we should write in a file named `<question_name>.yaml`.
+If we have some app in `<dir>/` and would like to generate a question using it, we should write our question a file named `<question_name>.yaml`.
 This file should include:
 - the prompt of the question (`prompt:`)
 - the file that a student submission would be written to (`submit_to:`)
@@ -33,9 +33,9 @@ To generate example question files on a system with `python` (version >=3.8) ins
 Successfully built rspecFppGen
 Installing collected packages: rspecFppGen
 Successfully installed rspecFppGen-0.1
-.../rspec-questionwriter/rspecFppGen $ cd ..
-.../rspec-questionwriter $ mkdir examples/questions
-.../rspec-questionwriter $ python -m rspecFppGen examples/leap_year/leap_year.yaml examples/questions/ examples/leap_year/app/
+.../rspec-questionwriter/rspecFppGen $ cd ../examples
+.../rspec-questionwriter/examples $ mkdir questions
+.../rspec-questionwriter/examples $ python -m rspecFppGen questions/ leap_year/app/ leap_year/leap_year.yaml
 Running FPP generator
 Generating from source examples/questions//leap_year.py
 - Extracting from source...
@@ -52,5 +52,5 @@ Done.
 patching file examples/questions//leap_year//tests/suite0/funcs.rb (read from examples/questions//leap_year//tests/common/funcs.rb)
 patching file examples/questions//leap_year//tests/suite1/funcs.rb (read from examples/questions//leap_year//tests/common/funcs.rb)
 - Writing grader metadata
-.../rspec-questionwriter $ 
+.../rspec-questionwriter/examples $ 
 ```
