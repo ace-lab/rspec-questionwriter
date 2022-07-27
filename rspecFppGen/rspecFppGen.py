@@ -30,14 +30,14 @@ def write_to(filename: str, content: str) -> None:
     with open(filename, 'w') as file:
         file.write(content)
 
-def make_parson_source(q_root: str, prompt: str, solution: str, q_name: str) -> None:
+def make_parson_source(generation_dir: str, prompt: str, solution: str, q_name: str) -> None:
     """Make source.py for the Faded-Parson's problem system"""
     source = f"""\"\"\"{prompt}\"\"\"
 \n
 {solution}
 \n
 """
-    write_to(f"{argv[2]}/{q_name}.py", source)
+    write_to(f"{generation_dir}/{q_name}.py", source)
     
 def apply_mutation(q_root: str, mutations: str, filename: str, variant_name: str) -> bytes:
     """runs `patch` on the filename with patchfile input `mutations` and returns stderr as bytes"""
@@ -81,57 +81,59 @@ def clean_up() -> None:
 
 def main():
     if len(argv) <= 3:
-        print(f"USAGE: {argv[0]} <question_data.yaml> <destination> <application root>")
+        print(f"USAGE: {argv[0]} <destination> <application root> <question1_data.yaml> [<question2_data.yaml> <question3_data.yaml> ...]")
         exit(1)
 
-    yaml_path = argv[1]
-    yaml_file = os.path.basename(yaml_path)
-    q_name = yaml_file[:yaml_file.index('.')]
-    q_root = f"{argv[2]}/{q_name}/"
-    common = argv[3]
+    destination = argv[1]
+    common = argv[2]
+    yaml_paths = argv[3:]
+    for yaml_path in yaml_paths:
+        yaml_file = os.path.basename(yaml_path)
+        q_name = yaml_file[:yaml_file.index('.')]
+        q_root = f"{destination}/{q_name}/"
 
-    content: Dict[str, Any] = yaml.safe_load(open(f"{yaml_path}"))
+        content: Dict[str, Any] = yaml.safe_load(open(f"{yaml_path}"))
 
-    assert "solution" in content.keys(), f"`solution:` is a required field in question.yaml"
-    assert "submit_to" in content.keys(), f"`submit_to:` is a required field in question.yaml"
-    # the other two fields are normally "mutations" and ""
+        assert "solution" in content.keys(), f"`solution:` is a required field in question.yaml"
+        assert "submit_to" in content.keys(), f"`submit_to:` is a required field in question.yaml"
+        # the other two fields are normally "mutations" and ""
 
-    prompt: str = content.get("prompt", "")
-    solution: str = content["solution"]
-    make_parson_source(q_root, prompt, solution, q_name)
-    
-    print(f"Running FPP generator")
-    import generate_fpp
-    args = generate_fpp.parse_args([f"{argv[2]}/{q_name}.py"])
-    if args.profile:
-        generate_fpp.profile_generate_many(args)
-    else:
-        generate_fpp.generate_many(args)
-    os.system(f"rm {argv[2]}/{q_name}.py")
+        prompt: str = content.get("prompt", "")
+        solution: str = content["solution"]
+        make_parson_source(destination, prompt, solution, q_name)
+        
+        print(f"Running FPP generator")
+        import generate_fpp
+        args = generate_fpp.parse_args([f"{destination}/{q_name}.py"])
+        if args.profile:
+            generate_fpp.profile_generate_many(args)
+        else:
+            generate_fpp.generate_many(args)
+        os.system(f"rm {destination}/{q_name}.py")
 
-    print(f"- Overwriting info.json")
-    write_to(f"{q_root}/info.json", base_info_json)
+        print(f"- Overwriting info.json")
+        write_to(f"{q_root}/info.json", base_info_json)
 
-    safe_mkdir(f"{q_root}/tests")
+        safe_mkdir(f"{q_root}/tests")
 
-    # instructor solution    
-    print(f"- Preparing solution")
-    safe_mkdir(f"{q_root}/tests/solution")
-    write_solution(q_root, solution)
+        # instructor solution    
+        print(f"- Preparing solution")
+        safe_mkdir(f"{q_root}/tests/solution")
+        write_solution(q_root, solution)
 
-    # load common files
-    print(f"- Loading common files")
-    safe_mkdir(f"{q_root}/tests/common")
-    os.system(f"cp -r {common}/* {q_root}/tests/common/")
+        # load common files
+        print(f"- Loading common files")
+        safe_mkdir(f"{q_root}/tests/common")
+        os.system(f"cp -r {common}/* {q_root}/tests/common/")
 
-    # load mutations (if any)
-    print(f"- Producing mutations")
-    mutations = content.get('mutations', [])
-    generate_variants(q_root, mutations)
+        # load mutations (if any)
+        print(f"- Producing mutations")
+        mutations = content.get('mutations', [])
+        generate_variants(q_root, mutations)
 
-    # load metadata (like what file the submission maps to)
-    print(f"- Writing grader metadata")
-    write_metadata(q_root, content['submit_to'])
+        # load metadata (like what file the submission maps to)
+        print(f"- Writing grader metadata")
+        write_metadata(q_root, content['submit_to'])
 
 if __name__ == "__main__":
     main()
