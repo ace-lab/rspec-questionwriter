@@ -103,7 +103,7 @@ def generate_server(setup_code: str, answer_code: str, *,
         Bcolors.warn('SyntaxError: Could not extract exports from answer')
         answer_names = []
 
-    if not setup_names: #and not answer_names:
+    if not setup_names: and not answer_names:
         return (SERVER_DEFAULT, [], [])
 
     def format_annotated_name(name: AnnotatedName) -> str:
@@ -149,4 +149,4 @@ def generate_server(setup_code: str, answer_code: str, *,
         , (0, '')
         ]
 
-    return ('\n'.join(tab * n + t for n, t in lines), setup_names, [])
+    return ('\n'.join(tab * n + t for n, t in lines), setup_names, answer_names)
