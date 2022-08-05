@@ -28,14 +28,14 @@ prompt: |
   </pl-code>
 
 solution: |
-  describe 'withdraw' do
-    it 'should not withdraw too much' do
+  describe 'withdraw' do #0given
+    it 'should not withdraw too much' do #1given
       amount = 20
       wallet = Wallet.new(amount)
       ?expect?{ wallet.withdraw(amount + 1) }.to ?raise_error?(InsufficientFundsError)
       ?expect?( wallet.cash ).to ?eq?(amount)
-    end
-  end
+    end #1given
+  end #0given
 
 TODO:
   simple mutations on SUT, use diff, operators, etc., change exception type, remove returns, etc.

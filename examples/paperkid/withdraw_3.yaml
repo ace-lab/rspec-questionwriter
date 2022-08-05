@@ -34,14 +34,14 @@ prompt: |
   </pl-code>
 
 solution: |
-  describe 'withdraw' do
-    it 'should not withdraw negative money' do
+  describe 'withdraw' do #0given
+    it 'should not withdraw negative money' do #1given
       amount = 20
       wallet = Wallet.new(amount)
       expect{ wallet.withdraw(-1 * amount) }.to raise_error(ArgumentError)
       expect( wallet.cash ).to eq(amount)
-    end
-  end
+    end #1given
+  end #0given
 
 TODO:
   simple mutations on SUT, use diff, operators, etc., change exception type, remove returns, etc.

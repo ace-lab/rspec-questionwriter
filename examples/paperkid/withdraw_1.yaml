@@ -15,15 +15,15 @@ prompt: |
   </pl-code>
 
 solution: |
-  describe 'withdraw' do
-    it 'should remove valid amount' do
+  describe 'withdraw' do #0given
+    it 'should remove valid amount' do #1given
       amount = 20
       amount_to_remove = 10
       wallet = Wallet.new(amount)
       ?expect?{ wallet.withdraw(?amount_to_remove?) }.?not_to? raise_error
       ?expect?(wallet.cash).to eq(amount - amount_to_remove)
-    end
-  end
+    end #1given
+  end #0given
 
 TODO:
   simple mutations on SUT, use diff, operators, etc., change exception type, remove returns, etc.
