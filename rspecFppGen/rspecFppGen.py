@@ -39,7 +39,7 @@ def make_parson_source(generation_dir: str, prompt: str, solution: str, q_name: 
 """
     write_to(f"{generation_dir}/{q_name}.py", source)
     
-def apply_mutation(q_root: str, mutations: str, filename: str, variant_name: str) -> bytes:
+def apply_mutation(q_root: str, mutations: str, filename: str, variant_name: str) -> int:
     """runs `patch` on the filename with patchfile input `mutations` and returns stderr as bytes"""
     in_file = f"{q_root}/tests/common/{filename}"
     out_file = f"{q_root}/tests/var_{variant_name}/{filename}"
@@ -50,8 +50,8 @@ def apply_mutation(q_root: str, mutations: str, filename: str, variant_name: str
         in_file,
     ]
 
-    error_out = run(command, input=mutations.encode(), stderr=PIPE).stderr
-    return error_out
+    return_code = run(command, input=mutations.encode(), stderr=PIPE).returncode
+    return return_code
 
 def generate_variants(q_root: str, variants: Dict):
 
@@ -61,9 +61,9 @@ def generate_variants(q_root: str, variants: Dict):
 
         for file, mutations in files.items():
             os.makedirs(os.path.dirname(f"{q_root}/tests/var_{variant}/{file}"), exist_ok=True)
-            err: bytes = apply_mutation(q_root, mutations, file, variant).decode("utf-8")
-            if len(err) > 0: # make sure to swap file and mutations args
-                raise RuntimeError(f"Unexpected error when applying mutation to {file} in variant {variant}: \n{err}")
+            err: int = apply_mutation(q_root, mutations, file, variant)
+            if err: # make sure to swap file and mutations args
+                raise RuntimeError(f"Unexpected error when applying mutation to {file} in variant {variant}: Exited with code {err}")
 
 def write_solution(q_root: str, solution: str) -> None:
     """Generate tests/solution/_submission_file using the provided solution"""
@@ -75,8 +75,11 @@ def write_metadata(q_root: str, submit_to: str) -> None:
         json_dumps({ "submission_file" : submit_to, "submission_root" : "" })
     )
 
-def clean_up() -> None:
+def clean_up(question_root: str) -> None:
     # TODO: remove all files and make it look like we were never here
+    print(f"Removing output directory: {question_root}")
+    os.system(f"rm -rf {question_root}")
+    print("Exiting.")
     exit(1)
 
 def main():
@@ -104,7 +107,7 @@ def main():
         
         print(f"Running FPP generator")
         import generate_fpp
-        args = generate_fpp.parse_args([f"{destination}/{q_name}.py"])
+        args = generate_fpp.parse_args(["--no-parse", f"{destination}/{q_name}.py"])
         if args.profile:
             generate_fpp.profile_generate_many(args)
         else:
@@ -129,7 +132,11 @@ def main():
         # load mutations (if any)
         print(f"- Producing mutations")
         mutations = content.get('mutations', [])
-        generate_variants(q_root, mutations)
+        try:
+            generate_variants(q_root, mutations)
+        except RuntimeError as e:
+            print(e.args[0])
+            clean_up(q_root)
 
         # load metadata (like what file the submission maps to)
         print(f"- Writing grader metadata")
