@@ -107,7 +107,7 @@ def main():
         
         print(f"Running FPP generator")
         import generate_fpp
-        args = generate_fpp.parse_args([f"{destination}/{q_name}.py"])
+        args = generate_fpp.parse_args(["--no-parse", f"{destination}/{q_name}.py"])
         if args.profile:
             generate_fpp.profile_generate_many(args)
         else:
