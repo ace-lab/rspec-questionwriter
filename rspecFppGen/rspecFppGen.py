@@ -1,4 +1,3 @@
-from copyreg import clear_extension_cache
 from subprocess import run, PIPE
 from typing import Any, Dict
 import yaml
