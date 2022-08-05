@@ -13,17 +13,17 @@ prompt: |
 solution: |
   describe 'leap_year' do
       it 'should return true on 2004 [00]' do
-          ?expect?(leap_year(2004)).?to? eq(?true?)
+          ?expect?(leap_year(2004)).?to? be_?truthy?
       end
   end
 mutations:
-  suite0:
+  var_logic_short_circuit:
     funcs.rb: |
       3c3
       <     return year % 400 == 0 || ((year % 4 == 0) && !(year % 100 == 0))
       ---
       >     year % 4 == 0
-  suite1:
+  var_400_year_check:
     funcs.rb: |
       3c3
       <     return year % 400 == 0 || ((year % 4 == 0) && !(year % 100 == 0))
