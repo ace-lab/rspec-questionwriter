@@ -97,13 +97,13 @@ def generate_server(setup_code: str, answer_code: str, *,
         Bcolors.warn('SyntaxError: Could not extract exports from setup')
         setup_names = []
 
-    try:
-        answer_names = GlobalNameVisitor.get_names(answer_code)
-    except SyntaxError:
-        Bcolors.warn('SyntaxError: Could not extract exports from answer')
-        answer_names = []
+    # try:
+    #     answer_names = GlobalNameVisitor.get_names(answer_code)
+    # except SyntaxError:
+    #     Bcolors.warn('SyntaxError: Could not extract exports from answer')
+    #     answer_names = []
 
-    if not setup_names and not answer_names:
+    if not setup_names: #and not answer_names:
         return (SERVER_DEFAULT, [], [])
 
     def format_annotated_name(name: AnnotatedName) -> str:
@@ -133,11 +133,11 @@ def generate_server(setup_code: str, answer_code: str, *,
         , (1, 'names_from_user = [')
         ]
     
-    if answer_names:
-        lines.extend((2, format_annotated_name(n)) for n in answer_names)
-    else:
-        lines.append((2, '# ex: student defines a determinant function name det'))
-        lines.append((2, '# {"name": "det", "description": "determinant for a 2x2 matrix", "type": "python function"}'))
+    # if answer_names:
+    #     lines.extend((2, format_annotated_name(n)) for n in answer_names)
+    # else:
+    #     lines.append((2, '# ex: student defines a determinant function name det'))
+    #     lines.append((2, '# {"name": "det", "description": "determinant for a 2x2 matrix", "type": "python function"}'))
     
     lines += \
         [ (1, ']')
@@ -149,4 +149,4 @@ def generate_server(setup_code: str, answer_code: str, *,
         , (0, '')
         ]
 
-    return ('\n'.join(tab * n + t for n, t in lines), setup_names, answer_names)
+    return ('\n'.join(tab * n + t for n, t in lines), setup_names, [])
