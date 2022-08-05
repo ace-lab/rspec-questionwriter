@@ -42,7 +42,7 @@ def make_parson_source(generation_dir: str, prompt: str, solution: str, q_name: 
 def apply_mutation(q_root: str, mutations: str, filename: str, variant_name: str) -> bytes:
     """runs `patch` on the filename with patchfile input `mutations` and returns stderr as bytes"""
     in_file = f"{q_root}/tests/common/{filename}"
-    out_file = f"{q_root}/tests/{variant_name}/{filename}"
+    out_file = f"{q_root}/tests/var_{variant_name}/{filename}"
 
     command = [
         "patch",
@@ -57,10 +57,10 @@ def generate_variants(q_root: str, variants: Dict):
 
     # each suite has a set of mutations
     for variant, files in variants.items():
-        safe_mkdir(f"{q_root}/tests/{variant}")
+        safe_mkdir(f"{q_root}/tests/var_{variant}")
 
         for file, mutations in files.items():
-            os.makedirs(os.path.dirname(f"{q_root}/tests/{variant}/{file}"), exist_ok=True)
+            os.makedirs(os.path.dirname(f"{q_root}/tests/var_{variant}/{file}"), exist_ok=True)
             err: bytes = apply_mutation(q_root, mutations, file, variant).decode("utf-8")
             if len(err) > 0: # make sure to swap file and mutations args
                 raise RuntimeError(f"Unexpected error when applying mutation to {file} in variant {variant}: \n{err}")
