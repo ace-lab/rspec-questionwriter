@@ -1,3 +1,4 @@
+from socket import SOL_ALG
 from subprocess import run, PIPE
 from typing import Any, Dict
 import yaml
@@ -6,7 +7,7 @@ from sys import argv
 import os
 from uuid import uuid4
 
-base_info_json = f"""{{
+base_info_json = lambda: f"""{{
     "uuid": "{uuid4()}",
     "title": "",
     "topic": "",
@@ -30,11 +31,11 @@ def write_to(filename: str, content: str) -> None:
     with open(filename, 'w') as file:
         file.write(content)
 
-def make_parson_source(generation_dir: str, prompt: str, solution: str, q_name: str) -> None:
+def make_parson_source(generation_dir: str, prompt: str, solution: Dict[str, str], q_name: str) -> None:
     """Make source.py for the Faded-Parson's problem system"""
     source = f"""\"\"\"{prompt}\"\"\"
 \n
-{solution}
+{json_dumps(solution)}
 \n
 """
     write_to(f"{generation_dir}/{q_name}.py", source)
@@ -69,10 +70,15 @@ def write_solution(q_root: str, solution: str) -> None:
     """Generate tests/solution/_submission_file using the provided solution"""
     write_to(f"{q_root}/tests/solution/_submission_file", solution.replace('?', ''))
 
-def write_metadata(q_root: str, submit_to: str) -> None:
+def write_metadata(q_root: str, submit_to: str, pre_text: str, post_text: str) -> None:
     write_to(
         f"{q_root}/tests/meta.json", 
-        json_dumps({ "submission_file" : submit_to, "submission_root" : "" })
+        json_dumps({ 
+            "submission_file" : submit_to, 
+            "submission_root" : "",
+            "pre-text" : pre_text,
+            "post-text" : post_text
+        })
     )
 
 def clean_up(question_root: str) -> None:
@@ -102,8 +108,7 @@ def main():
         # the other two fields are normally "mutations" and ""
 
         prompt: str = content.get("prompt", "")
-        solution: str = content["solution"]
-        make_parson_source(destination, prompt, solution, q_name)
+        make_parson_source(destination, prompt, content["solution"], q_name)
         
         print(f"Running FPP generator")
         import generate_fpp
@@ -115,14 +120,21 @@ def main():
         os.system(f"rm {destination}/{q_name}.py")
 
         print(f"- Overwriting info.json")
-        write_to(f"{q_root}/info.json", base_info_json)
+        write_to(f"{q_root}/info.json", base_info_json())
 
         safe_mkdir(f"{q_root}/tests")
 
         # instructor solution    
         print(f"- Preparing solution")
         safe_mkdir(f"{q_root}/tests/solution")
-        write_solution(q_root, solution)
+        write_solution(
+            q_root, 
+            "\n".join([
+                content["solution"]["pre"], 
+                content["solution"]["lines"], 
+                content["solution"]["post"]
+            ])
+        )
 
         # load common files
         print(f"- Loading common files")
@@ -132,15 +144,21 @@ def main():
         # load mutations (if any)
         print(f"- Producing mutations")
         mutations = content.get('mutations', [])
-        try:
-            generate_variants(q_root, mutations)
-        except RuntimeError as e:
-            print(e.args[0])
-            clean_up(q_root)
+        if mutations is not None:
+            try:
+                generate_variants(q_root, mutations)
+            except RuntimeError as e:
+                print(e.args[0])
+                clean_up(q_root)
+        else:
+            print(f"No mutations found for {yaml_file}: generating no mutations")
 
         # load metadata (like what file the submission maps to)
         print(f"- Writing grader metadata")
-        write_metadata(q_root, content['submit_to'])
+        write_metadata(q_root, content["submit_to"], content["solution"]["pre"], content["solution"]["post"])
+
+        from io_helpers import Bcolors
+        Bcolors.printf(Bcolors.OKGREEN, 'Done.')
 
 if __name__ == "__main__":
     main()

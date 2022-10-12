@@ -1,7 +1,8 @@
 from typing import *
 
 from collections import defaultdict, namedtuple
-from json import dumps
+from json import dumps, loads
+from json.decoder import JSONDecodeError
 from os import path
 from re import finditer, match as test
 from shutil import copyfile
@@ -189,14 +190,14 @@ def extract_regions(
 
 
 def generate_question_html(
-    prompt_code: str, *,
+    prompt_code: Dict[str, str], *,
     question_text: str = None,
     tab: str = '  ',
     setup_names: List[AnnotatedName] = None,
     answer_names: List[AnnotatedName] = None
 ) -> str:
     """Turn an extracted prompt string into a question html file body"""
-    indented = prompt_code.replace('\n', '\n' + tab)
+    indented = prompt_code['lines'].replace('\n', '\n' + tab)
 
     if question_text is None:
         question_text = tab + '<!-- Write the question prompt here -->'
@@ -226,17 +227,41 @@ def generate_question_html(
                 map(format_annotated_name, answer_names))
 
         question_text += '\n</markdown>\n'
+    
+    pre_text = prompt_code.get("pre", "")
+    post_text = prompt_code.get("post", "")
 
-    return """<!-- AUTO-GENERATED FILE -->
-<pl-question-panel>
+    header = "<!-- AUTO-GENERATED FILE -->"
+    q_panel = """<pl-question-panel>
 {question_text}
-</pl-question-panel>
+</pl-question-panel>""".format(question_text=question_text)
+    
+    info = "<!-- see README for where the various parts of question live -->"
 
-<!-- see README for where the various parts of question live -->
-<pl-faded-parsons>
+    pre_tag = """<pre-text>
+{pre_text}
+</pre-text>""".format(pre_text=pre_text)
+    code_lines = """<code-lines>
+{lines}
+</code-lines>""".format(lines=f"{tab}{indented}")
+    post_tag = """<post-text>
+{post_text}
+</post-text>""".format(post_text=post_text)
+
+    if prompt_code.get('format', 'horizontal') == 'vertical':
+        element = "<pl-faded-parsons format=\"vertical\">\n"
+        if pre_text is not "":
+            element +=  pre_tag + "\n"
+        element += code_lines
+        if post_text is not "":
+            element += "\n" + post_tag
+        element += "\n</pl-faded-parsons>"
+    else:
+        element = """<pl-faded-parsons>
 {tab}{indented}
-</pl-faded-parsons>""".format(question_text=question_text, tab=tab, indented=indented)
+</pl-faded-parsons>""".format(tab=tab, indented=indented)
 
+    return "\n".join([header, q_panel, info, '', element])
 
 def generate_info_json(question_name: str, *, indent=4) -> str:
     """ Creates the default info.json for a new FPP question, with a unique v4 UUID.
@@ -272,7 +297,7 @@ def generate_fpp_question(
     """ Takes a path of a well-formatted source (see `extract_prompt_ans`),
         then generates and populates a question directory of the same name.
     """
-    Bcolors.printf(Bcolors.OKBLUE, 'Generating from source', source_path)
+    Bcolors.printf(Bcolors.OKBLUE, 'Generating FPP from source', source_path)
 
     source_path = resolve_path(source_path)
 
@@ -320,8 +345,15 @@ def generate_fpp_question(
     prompt_code = remove_region('prompt_code')
     question_text = remove_region('question_text')
 
+    # turn prompt_code into the pre,lines,post triad
+    try:
+        solution = loads(prompt_code) # json loads
+        solution.update({ 'format' : 'vertical' })
+    except JSONDecodeError:
+        solution = { 'lines' : prompt_code }
+
     question_html = generate_question_html(
-        prompt_code,
+        solution,
         question_text=question_text,
         setup_names=setup_names,
         answer_names=answer_names if show_required else None
@@ -366,8 +398,6 @@ def generate_fpp_question(
 
         # write files
         write_to(question_dir, raw_path, data)
-
-    Bcolors.printf(Bcolors.OKGREEN, 'Done.')
 
 
 def generate_many(args: Namespace):
