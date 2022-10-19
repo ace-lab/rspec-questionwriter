@@ -349,6 +349,9 @@ def generate_fpp_question(
     try:
         solution = loads(prompt_code) # json loads
         solution.update({ 'format' : 'vertical' })
+        solution.update({
+            'lines' : extract_regions(solution['lines']).get('prompt_code')
+        })
     except JSONDecodeError:
         solution = { 'lines' : prompt_code }
 
