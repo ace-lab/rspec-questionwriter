@@ -336,6 +336,10 @@ def generate_fpp_question(
 
     setup_code = remove_region('setup_code', SETUP_CODE_DEFAULT)
     answer_code = remove_region('answer_code')
+    try:
+        answer_code = loads(answer_code)['lines']
+    except:
+        pass
 
     server_code = remove_region('server')
     gen_server_code, setup_names, answer_names = generate_server(
