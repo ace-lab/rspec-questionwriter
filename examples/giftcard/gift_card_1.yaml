@@ -1,0 +1,47 @@
+submit_to: spec/gift_card_spec.rb
+prompt: |
+  Your app manages online gift cards for a soon-to-be-major e-tailer.
+  Customers can use the app to place orders using their card
+  balance. <br /><br />
+
+  We have classes that model the GiftCard and the Customer.  First you
+  will write tests for the GiftCard class, to verify that: <br /><br />
+
+  * a GiftCard when first created has a non-negative cash balance <br />
+  * a withdrawal when there is enough cash returns success, and changes 
+  the card balance <br />
+  * a withdrawal when there is not enough cash returns failure, provides 
+  an error message explaining the failure, and does not change the card balance. <br />
+  
+solution:
+  pre: |
+    describe GiftCard do
+  lines: | 
+      it 'fails with negative balance' do
+        expect { GiftCard.new(-1) }.to raise_error(?ArgumentError?)
+      end
+      it 'succeeds with positive balance' do
+        gift_card = GiftCard.new(20)
+        ?expect?(gift_card.balance).to ?eq?(20)
+      end
+  post: |
+    end
+mutations:
+  var_1:
+    giftcard.rb: |
+      4c4
+      <     if @balance < 0
+      ---
+      >     if @balance >= 0
+  var_2:
+    giftcard.rb: |
+      7c7
+      <     @balance = balance
+      ---
+      >     @balance = -balance
+  var_3:
+    giftcard.rb: |
+      8c8
+      <     @error = nil
+      ---
+      >     @error = 'not nil'

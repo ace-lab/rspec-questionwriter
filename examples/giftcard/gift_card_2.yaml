@@ -1,0 +1,70 @@
+submit_to: spec/gift_card_spec.rb
+prompt: |
+  Your app manages online gift cards for a soon-to-be-major e-tailer.
+  Customers can use the app to place orders using their card
+  balance. <br /><br />
+
+  We have classes that model the GiftCard and the Customer.  First you
+  will write tests for the GiftCard class, to verify that: <br /><br />
+
+  * a GiftCard when first created has a non-negative cash balance <br />
+  * a withdrawal when there is enough cash returns success, and changes
+  the card balance <br />
+  * a withdrawal when there is not enough cash returns failure, provides 
+  an error message explaining the failure, and does not change the card balance. <br /><br />
+  
+  The provided code before the submission box is semantically equivalent to the 
+  code you wrote previously, but take note that we have chosen to separate it 
+  logically by putting it into a `describe` block.
+  
+solution: 
+  pre: |
+    describe GiftCard do
+      describe 'creating' do
+        it 'fails with negative balance' do
+          expect { GiftCard.new(-1) }.to raise_error(ArgumentError)
+        end
+        it 'succeeds with positive balance' do
+          gift_card = GiftCard.new(20)
+          expect(gift_card.balance).to eq(20)
+        end
+      end
+      describe 'withdrawing with sufficient balance' do
+  lines: |
+        it 'returns truthy value' do
+          @gift_card = GiftCard.new(20)
+          @result = @gift_card.?withdraw?(15)
+          ?expect?(@result).to be_truthy
+        end
+        it 'changes the balance' do
+          @gift_card = GiftCard.new(20)
+          @result = @gift_card.withdraw(15)
+          expect(@gift_card.balance).to ?eq?(5)
+        end
+        it 'does not result in error message' do
+          @gift_card = GiftCard.new(20)
+          @result = @gift_card.withdraw(15)
+          expect(@gift_card.?error?).to be_empty
+        end
+  post: |+2
+      end
+    end
+mutations:
+  var_1:
+    giftcard.rb: |
+      11c11
+      <     if @balance >= amount
+      ---
+      >     if @balance < amount
+  var_2:
+    giftcard.rb: |
+      12c12
+      <       @balance -= amount
+      ---
+      >       @balance += amount
+  var_3:
+    giftcard.rb: |
+      12c12
+      <       @balance -= amount
+      ---
+      >       @error = 'not empty'
