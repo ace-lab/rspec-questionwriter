@@ -69,8 +69,7 @@ def generate_variants(q_root: str, variants: Dict):
 def write_solution(q_root: str, solution: str) -> None:
     """Generate tests/solution/_submission_file using the provided solution"""
     write_to(f"{q_root}/tests/solution/_submission_file", solution.replace('?', ''))
-    safe_mkdir(f"{q_root}/serverFilesQuestion/")
-    write_to(f"{q_root}/serverFilesQuestion/solution.py", solution.replace('?', ''))
+    write_to(f"{q_root}/tests/ans.py", solution.replace('?', ''))
 
 def write_metadata(q_root: str, submit_to: str, pre_text: str, post_text: str) -> None:
     write_to(
