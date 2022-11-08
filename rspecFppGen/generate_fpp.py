@@ -249,7 +249,7 @@ def generate_question_html(
 </post-text>""".format(post_text=post_text)
 
     if prompt_code.get('format', 'horizontal') == 'vertical':
-        element = "<pl-faded-parsons format=\"vertical\">\n"
+        element = "<pl-faded-parsons format=\"vertical\" language=\"ruby\">\n"
         if pre_text is not "":
             element +=  pre_tag + "\n"
         element += code_lines
