@@ -13,14 +13,17 @@ prompt: |
 
   Write a test that verifies the assignment of template variable <code>movie</code> 
   when a user sends a Movie creation request. 
-solution: | 
-  specify 'successful Movie creation sets template variable' do
-    fake_movie = double(?'Movie'?) 
-    date = DateTime.new(1992, 11, 25)
-    allow(?Movie?).to receive('create!').with('Aladdin', 'G', date).and_return(fake_movie)
-    ?post? 'create_movie', :title => 'Aladdin', :rating => 'G', :release_date => date
-    expect(?assigns('movie')?).to eq(fake_movie)
-  end
+solution:
+  pre: |
+    specify 'successful Movie creation sets template variable' do
+  lines: |
+      fake_movie = double(?'Movie'?) 
+      date = DateTime.new(1992, 11, 25)
+      allow(?Movie?).to receive('create!').with('Aladdin', 'G', date).and_return(fake_movie)
+      ?post? 'create_movie', :title => 'Aladdin', :rating => 'G', :release_date => date
+      expect(?assigns('movie')?).to eq(fake_movie)
+  post: |
+    end
 mutations: 
   var_missing_assignment: 
     app/controllers/movies_controller.rb: | 
