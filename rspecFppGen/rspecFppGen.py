@@ -13,6 +13,7 @@ base_info_json = lambda: f"""{{
     "topic": "",
     "tags": [],
     "type": "v3",
+    "singleVariant": true,
     "gradingMethod" : "External",
     "externalGradingOptions": {{
         "enabled": true,
