@@ -1,4 +1,4 @@
-submit_to: spec/gift_card_spec.rb
+submit_to: spec/giftcard_spec.rb
 prompt: |
   Your app manages online gift cards for a soon-to-be-major e-tailer.
   Customers can use the app to place orders using their card
@@ -27,21 +27,26 @@ solution:
   post: |
     end
 mutations:
-  var_1:
-    giftcard.rb: |
-      4c4
-      <     if @balance < 0
-      ---
-      >     if @balance >= 0
-  var_2:
-    giftcard.rb: |
-      7c7
-      <     @balance = balance
-      ---
-      >     @balance = -balance
-  var_3:
-    giftcard.rb: |
-      8c8
-      <     @error = nil
-      ---
-      >     @error = 'not nil'
+  wrong_withdraw_check:
+    exclude: 
+      - "GiftCard succeeds with positive balance"
+    files:
+      giftcard.rb: |
+        4c4
+        <     if @balance < 0
+        ---
+        >     if @balance >= 0
+  initialize_balance_incorrectly:
+    files:
+      giftcard.rb: |
+        7c7
+        <     @balance = balance
+        ---
+        >     @balance = -balance
+  non_nil_error_initialization:
+    files:
+      giftcard.rb: |
+        8c8
+        <     @error = nil
+        ---
+        >     @error = 'not nil'

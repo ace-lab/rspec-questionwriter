@@ -58,8 +58,10 @@ def apply_mutation(q_root: str, mutations: str, filename: str, variant_name: str
 def generate_variants(q_root: str, variants: Dict):
 
     # each suite has a set of mutations
-    for variant, files in variants.items():
+    # for variant, files in variants.items():
+    for variant, data in variants.items():
         safe_mkdir(f"{q_root}/tests/var_{variant}")
+        files = data["files"]
 
         for file, mutations in files.items():
             os.makedirs(os.path.dirname(f"{q_root}/tests/var_{variant}/{file}"), exist_ok=True)
@@ -72,14 +74,18 @@ def write_solution(q_root: str, solution: str) -> None:
     write_to(f"{q_root}/tests/solution/_submission_file", solution.replace('?', ''))
     write_to(f"{q_root}/tests/ans.py", solution.replace('?', ''))
 
-def write_metadata(q_root: str, submit_to: str, pre_text: str, post_text: str) -> None:
+def write_metadata(q_root: str, summary: dict) -> None:
     write_to(
         f"{q_root}/tests/meta.json", 
         json_dumps({ 
-            "submission_file" : submit_to, 
+            "submission_file" : summary["submit_to"], 
             "submission_root" : "",
-            "pre-text" : pre_text,
-            "post-text" : post_text
+            "pre-text" : summary["solution"]["pre"],
+            "post-text" : summary["solution"]["post"],
+            "grading_exclusions" : {
+                var : details.get("exclude", [])
+                for var, details in summary["mutations"].items()
+            }
         })
     )
 
@@ -113,13 +119,14 @@ def main():
         make_parson_source(destination, prompt, content["solution"], q_name)
         
         print(f"Running FPP generator")
-        import generate_fpp
-        args = generate_fpp.parse_args(["--no-parse", f"{destination}/{q_name}.py"])
-        if args.profile:
-            generate_fpp.profile_generate_many(args)
-        else:
-            generate_fpp.generate_many(args)
-        os.system(f"rm {destination}/{q_name}.py")
+        if True:
+            import generate_fpp
+            args = generate_fpp.parse_args(["--no-parse", f"{destination}/{q_name}.py"])
+            if args.profile:
+                generate_fpp.profile_generate_many(args)
+            else:
+                generate_fpp.generate_many(args)
+            os.system(f"rm {destination}/{q_name}.py")
 
         print(f"- Overwriting info.json")
         write_to(f"{q_root}/info.json", base_info_json())
@@ -157,7 +164,7 @@ def main():
 
         # load metadata (like what file the submission maps to)
         print(f"- Writing grader metadata")
-        write_metadata(q_root, content["submit_to"], content["solution"]["pre"], content["solution"]["post"])
+        write_metadata(q_root, content)
 
         from io_helpers import Bcolors
         Bcolors.printf(Bcolors.OKGREEN, 'Done.')

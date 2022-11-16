@@ -50,21 +50,26 @@ solution:
       end
     end
 mutations:
-  var_1:
-    giftcard.rb: |
-      11c11
-      <     if @balance >= amount
-      ---
-      >     if @balance < amount
-  var_2:
-    giftcard.rb: |
-      12c12
-      <       @balance -= amount
-      ---
-      >       @balance += amount
-  var_3:
-    giftcard.rb: |
-      12c12
-      <       @balance -= amount
-      ---
-      >       @error = 'not empty'
+  wrong_withdraw_check:
+    files:
+      giftcard.rb: |
+        11c11
+        <     if @balance >= amount
+        ---
+        >     if @balance < amount
+  incorrectly_update_balance:
+    exclude:
+      - "GiftCard withdrawing with sufficient balance does not result in error message"
+    files:
+      giftcard.rb: |
+        12c12
+        <       @balance -= amount
+        ---
+        >       @balance += amount
+  error_instead_of_deduct:
+    files:
+      giftcard.rb: |
+        12c12
+        <       @balance -= amount
+        ---
+        >       @error = 'not empty'
