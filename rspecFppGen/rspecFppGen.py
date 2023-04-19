@@ -1,4 +1,3 @@
-from socket import SOL_ALG
 from subprocess import run, PIPE
 from typing import Any, Dict
 import yaml
