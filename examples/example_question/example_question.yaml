@@ -13,8 +13,9 @@ solution:
   post: ""
 mutations:
   suite1:
-    funcs.rb: |
-      19c19
-      <     n % 2 == 0
-      ---
-      >     !(inc(n) % 2 == 0)
+    files:
+      funcs.rb: |
+        19c19
+        <     n % 2 == 0
+        ---
+        >     !(inc(n) % 2 == 0)
